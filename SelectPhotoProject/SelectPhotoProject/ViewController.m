@@ -58,6 +58,7 @@
 
 - (void)clickSave {
 //    [[SelectPhoto sharedInstance] savePhotoToSystemLibary:_imageView.image delegate:self];
+    NSLog(@"点保存");
     [[SelectPhoto sharedInstance] savePhotoToCustomLibary:_imageView.image libaryName:@"啦啦啦" delegate:self];
 }
 

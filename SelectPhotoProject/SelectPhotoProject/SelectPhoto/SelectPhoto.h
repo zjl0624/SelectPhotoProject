@@ -10,8 +10,8 @@
 #import <Photos/Photos.h>
 @protocol SelectPhotoDelegate<NSObject>
 @optional
-- (void)selectPhoto:(UIImage *)image;
-- (void)savePhoto:(BOOL)isSuccess;
+- (void)selectPhoto:(UIImage *)image;//选择照片回调
+- (void)savePhoto:(BOOL)isSuccess;//保存照片回调
 @end
 NS_ASSUME_NONNULL_BEGIN
 

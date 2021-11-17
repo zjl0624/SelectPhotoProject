@@ -12,7 +12,7 @@ static id _instance;
 
 @interface SelectPhoto()<UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 @property (strong,nonatomic) UIImagePickerController *imagePicker;
-
+@property (assign,nonatomic) BOOL isSaving;//是否正在进行保存
 @end
 @implementation SelectPhoto
 + (instancetype)sharedInstance
@@ -92,15 +92,20 @@ static id _instance;
 
 - (void)savePhotoToCustomLibary:(UIImage *)image libaryName:(NSString *)libary delegate:(nonnull id<SelectPhotoDelegate>)delegate{
     self.delegate = delegate;
-
+    if (_isSaving) {
+        return;
+    }
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         if (status == PHAuthorizationStatusAuthorized) {
+            
+            _isSaving = YES;
             NSError *error = nil;
             __block PHObjectPlaceholder *placeholder = nil;
             [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
                placeholder =  [PHAssetChangeRequest creationRequestForAssetFromImage:image].placeholderForCreatedAsset;
             } error:&error];
             if (error) {
+                _isSaving = NO;
                 NSLog(@"保存失败");
                 if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
                     [self.delegate savePhoto:NO];
@@ -122,10 +127,12 @@ static id _instance;
                     createCollectionID = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:title].placeholderForCreatedAssetCollection.localIdentifier;
                 } error:&error];
                 if (error) {
+                    _isSaving = NO;
                     if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
                         [self.delegate savePhoto:NO];
                     }
                     NSLog(@"创建相册失败");
+                    return;;
                 }else {
                     createCollection = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[createCollectionID] options:nil].firstObject;
                 }
@@ -139,11 +146,14 @@ static id _instance;
                 [requtes insertAssets:@[placeholder] atIndexes:[NSIndexSet indexSetWithIndex:0]];
             } error:&error];
             if (error) {
+                _isSaving = NO;
                 if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
                     [self.delegate savePhoto:NO];
                 }
                 NSLog(@"保存图片失败");
+                return;
             } else {
+                _isSaving = NO;
                 if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
                     [self.delegate savePhoto:YES];
                 }
