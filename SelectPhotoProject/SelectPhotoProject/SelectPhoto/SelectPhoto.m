@@ -81,11 +81,16 @@ static id _instance;
 {
     if(!error){
         if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
-            [self.delegate savePhoto:YES];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate savePhoto:YES];
+            });
+            
         }
     }else{
         if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
-            [self.delegate savePhoto:NO];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate savePhoto:NO];
+            });
         }
     }
 }
@@ -108,7 +113,9 @@ static id _instance;
                 _isSaving = NO;
                 NSLog(@"保存失败");
                 if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
-                    [self.delegate savePhoto:NO];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.delegate savePhoto:NO];
+                    });
                 }
                 return;
             }
@@ -129,7 +136,9 @@ static id _instance;
                 if (error) {
                     _isSaving = NO;
                     if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
-                        [self.delegate savePhoto:NO];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self.delegate savePhoto:NO];
+                        });
                     }
                     NSLog(@"创建相册失败");
                     return;;
@@ -148,21 +157,27 @@ static id _instance;
             if (error) {
                 _isSaving = NO;
                 if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
-                    [self.delegate savePhoto:NO];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.delegate savePhoto:NO];
+                    });
                 }
                 NSLog(@"保存图片失败");
                 return;
             } else {
                 _isSaving = NO;
                 if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
-                    [self.delegate savePhoto:YES];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.delegate savePhoto:YES];
+                    });
                 }
                 NSLog(@"保存图片成功");
             }
 
         } else {
             if ([self.delegate respondsToSelector:@selector(savePhoto:)]) {
-                [self.delegate savePhoto:NO];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.delegate savePhoto:NO];
+                });
                 NSLog(@"没权限");
             }
         }
